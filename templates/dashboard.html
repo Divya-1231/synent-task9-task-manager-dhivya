@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Task Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <div>
+                <h1>My Task Manager</h1>
+                <p>Welcome, {{ username }}!</p>
+            </div>
+            <a class="logout" href="{{ url_for('logout') }}">Logout</a>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="add-section">
+            <h2>Add New Task</h2>
+            <form action="{{ url_for('add_task') }}" method="POST">
+                <input type="text" name="title" placeholder="Task title" required>
+                <textarea name="description" placeholder="Task description"></textarea>
+                <button type="submit">Add Task</button>
+            </form>
+        </section>
+
+        <section class="task-section">
+            <h2>My Tasks</h2>
+
+            {% if tasks %}
+                {% for task in tasks %}
+                    <div class="task-card">
+                        <div>
+                            <h3>{{ task.title }}</h3>
+                            <p>{{ task.description }}</p>
+                            <span class="status">{{ task.status }}</span>
+                        </div>
+
+                        <div class="actions">
+                            <form action="{{ url_for('update_task', task_id=task.id) }}" method="POST">
+                                <select name="status">
+                                    <option value="Pending"
+                                        {% if task.status == 'Pending' %}selected{% endif %}>
+                                        Pending
+                                    </option>
+                                    <option value="Completed"
+                                        {% if task.status == 'Completed' %}selected{% endif %}>
+                                        Completed
+                                    </option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+
+                            <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
+                                <button class="delete" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty">No tasks yet. Add your first task!</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>
